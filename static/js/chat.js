@@ -60,6 +60,11 @@ $("form").submit(function (evt) {
   evt.preventDefault();
 
   let data = { type: "chat", text: $("#m").val() };
+
+  if(data.text === "/joke"){
+    data = { type: "get-joke", text: $("#m").val() };
+  }
+
   ws.send(JSON.stringify(data));
 
   $("#m").val("");

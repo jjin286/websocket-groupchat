@@ -32,6 +32,7 @@ class ChatUser {
       this._send(data);
     } catch {
       // If trying to send to a user fails, ignore it
+      console.log('error', data)
     }
   }
 
@@ -62,6 +63,21 @@ class ChatUser {
     });
   }
 
+  /** Handle a chat: broadcast to room.
+     *
+     * @param text {string} message to send
+     * */
+
+  async handleJoke() {
+    const response = await fetch('https://icanhazdadjoke.com/',
+    {
+      headers:{"Accept": "application/json"}
+    });
+    const data = await response.json();
+
+    this.send(JSON.stringify({type: "chat", text: data.joke, name: this.room.name}));
+  }
+
   /** Handle messages from client:
    *
    * @param jsonData {string} raw message data
@@ -72,11 +88,12 @@ class ChatUser {
    * </code>
    */
 
-  handleMessage(jsonData) {
+  async handleMessage(jsonData) {
     let msg = JSON.parse(jsonData);
 
     if (msg.type === "join") this.handleJoin(msg.name);
     else if (msg.type === "chat") this.handleChat(msg.text);
+    else if (msg.type === 'get-joke') await this.handleJoke();
     else throw new Error(`bad message: ${msg.type}`);
   }
 
